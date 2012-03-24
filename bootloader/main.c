@@ -221,7 +221,7 @@ int __attribute__((noreturn)) main(void)
     volatile int zero = 0;
 
     /* initialize hardware */
-    PORTC |= _BV(PC2);
+    PORTB |= _BV(PB0);
 
     _delay_us(30);
 
@@ -229,15 +229,16 @@ int __attribute__((noreturn)) main(void)
     DBG1(0x00, 0, 0);
     /* jump to application if jumper is set */
     if (pgm_read_byte(zero) == 0xff ||
-	(PINC & _BV(PC2)) == 0) {
+	(PINB & _BV(PB0)) == 0) {
         uchar i = 0, j = 0;
 #ifndef TEST_MODE
         GICR = (1 << IVCE);  /* enable change of interrupt vectors */
         GICR = (1 << IVSEL); /* move interrupts to boot flash section */
 #endif
 
-	DDRC |= _BV(PC3);
-	DDRD |= _BV(PD7);
+	DDRC |= 0x3f;
+	DDRB |= 0x20;
+	DDRD |= _BV(PD5);
 
         initForUsbConnectivity();
         do{ /* main event loop */
@@ -254,9 +255,9 @@ int __attribute__((noreturn)) main(void)
                 }
             }
 #endif
-	    if (blink++ == 50000) {
-		PORTC ^= _BV(PC3);
-		PORTD ^= _BV(PD7);
+	    if (blink++ == 20000) {
+		PORTC ^= 0x33;
+		PORTB ^= 0x20;
 		blink = 0;
 	    }
         } while (1);
