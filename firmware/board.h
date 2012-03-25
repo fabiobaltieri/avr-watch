@@ -82,8 +82,8 @@
 		SW_B_PCMSK |= _BV(SW_B_PCINT);	\
 	} while (0)
 
-#define sw_a_read() (SW_A_PIN & _BV(SW_A))
-#define sw_b_read() (SW_A_PIN & _BV(SW_A))
+#define sw_a_read() (!(SW_A_PIN & _BV(SW_A)))
+#define sw_b_read() (!(SW_A_PIN & _BV(SW_A)))
 
 /* CHG */
 #define CHG_PCINT	PCINT20
