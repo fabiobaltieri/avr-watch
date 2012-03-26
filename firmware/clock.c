@@ -42,6 +42,8 @@ static uint8_t numbers[] = { 0x9f, 0x84, 0x2f, 0xad, /* 0 1 2 3 */
 };
 #define LCD_DOT 0x40
 
+static int refresh_running;
+
 static uint8_t usb_enabled;
 
 static void usb_toggle(void)
@@ -84,18 +86,18 @@ ISR(TIMER0_COMPA_vect)
 
 	led_set(digits[digit_count]);
 
-	if (state == S_STANDBY) {
-		/* stop and clear on 4th digit if in standby */
-		if (digit_count == 4) {
-			led_set(0x00);
-			PRR |= _BV(PRTIM0);
-		}
-	} else if (state == S_TIME) {
-		/* blink dots in TIME state */
+	/* blink dots in TIME state */
+	if (state == S_TIME) {
 		if (ticks++ < TICK_COUNT)
 			digits[4] = 0xff;
 		else
 			digits[4] = 0x00;
+	}
+
+	/* stop and clear on 4th digit */
+	if (!refresh_running && digit_count == 4) {
+		led_set(0x00);
+		PRR |= _BV(PRTIM0);
 	}
 
 	digit_count = (digit_count + 1) % 5;
@@ -196,6 +198,7 @@ void clock_init(void)
 	time = 0;
 	ticks = 0;
 	digit_count = 0;
+	refresh_running = 0;
 
 	state = S_STANDBY;
 
@@ -237,6 +240,10 @@ void clock_poll(void)
 		break;
 	}
 
-	if (state != S_STANDBY)
+	if (state != S_STANDBY) {
+		refresh_running = 1;
 		PRR &= ~_BV(PRTIM0); /* start refresh timer */
+	} else {
+		refresh_running = 0;
+	}
 }
