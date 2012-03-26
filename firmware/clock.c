@@ -95,12 +95,12 @@ ISR(TIMER0_COMPA_vect)
 	}
 }
 
-void clear_display(void)
+static void clear_display(void)
 {
 	memset(digits, 0, sizeof(digits));
 }
 
-void show_voltage(void)
+static void show_voltage(void)
 {
 	uint32_t voltage;
 
@@ -117,7 +117,7 @@ void show_voltage(void)
 	digits[3] = numbers[voltage % 10];
 }
 
-void show_time(void)
+static void show_time(void)
 {
 	uint8_t hour;
 	uint8_t minute;
