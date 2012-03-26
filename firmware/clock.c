@@ -177,6 +177,7 @@ static void timer_init(void)
 		   (1 << CS02) | (0 << CS01) | (0 << CS00) );
 
 	/* Timer 1 - real time couter */
+
 	OCR1A = (F_CPU / 256) - 1;
 
 	TIMSK1 = ( (1 << OCIE1A) );
