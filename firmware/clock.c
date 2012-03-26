@@ -6,16 +6,15 @@
 
 #include "adc.h"
 
-#define TIME_1S_TOP 375
 #define TIME_TIMEOUT 5
-#define BATT_TIMEOUT 5
+#define BATT_TIMEOUT 2
 
 uint32_t time;
 
-static uint16_t jiffies;
+static uint16_t ticks;
 static uint32_t step_mark;
 
-static enum clock_state {
+static volatile enum clock_state {
 	S_STANDBY,
 	S_TIME,
 	S_BATT,
@@ -69,6 +68,16 @@ ISR(TIMER0_COMPA_vect)
 	led_set(digits[digit_count]);
 
 	digit_count = (digit_count + 1) % 5;
+
+	/* blink dots in TIME state */
+	if (state == S_TIME) {
+		if (ticks < 100)
+			digits[4] = 0xff;
+		else
+			digits[4] = 0x00;
+	}
+
+	ticks++;
 }
 
 void clear_display(void)
@@ -107,18 +116,13 @@ void show_time(void)
 	digits[1] = numbers[hour % 10];
 	digits[2] = numbers[minute / 10 % 10];
 	digits[3] = numbers[minute % 10];
-	if (jiffies < TIME_1S_TOP / 8)
-		digits[4] = 0xff;
-	else
-		digits[4] = 0x00;
 }
 
-ISR(TIMER2_COMPA_vect)
+ISR(TIMER1_COMPA_vect)
 {
-	jiffies = (jiffies + 1) % TIME_1S_TOP;
+	time++;
 
-	if (jiffies == 0)
-		time++;
+	ticks = 0;
 
 	if (state == S_TIME)
 		show_time();
@@ -148,14 +152,14 @@ static void timer_init(void)
 	TCCR0B = ( (0 << WGM02) |
 		   (1 << CS02) | (0 << CS01) | (0 << CS00) );
 
-	/* Timer 2 - real time couter */
-	OCR2A = (F_CPU / 256 / TIME_1S_TOP) - 1;
+	/* Timer 1 - real time couter */
+	OCR1A = (F_CPU / 256) - 1;
 
-	TIMSK2 = ( (1 << OCIE2A) );
+	TIMSK1 = ( (1 << OCIE1A) );
 
-	TCCR2A = ( (1 << WGM21) | (0 << WGM20) );
-	TCCR2B = ( (0 << WGM22) |
-		   (1 << CS22) | (1 << CS21) | (0 << CS20) );
+	TCCR1A = ( (0 << WGM11) | (0 << WGM10) );
+	TCCR1B = ( (0 << WGM13) | (1 << WGM12) |
+		   (1 << CS22) | (0 << CS21) | (0 << CS20) );
 }
 
 void clock_init(void)
@@ -165,7 +169,7 @@ void clock_init(void)
 	timer_init();
 
 	time = 0;
-	jiffies = 0;
+	ticks = 0;
 	digit_count = 0;
 
 	state = S_STANDBY;
@@ -180,6 +184,7 @@ void clock_poll(void)
 	case S_STANDBY:
 		clear_display();
 		if (sw_a_read()) {
+			show_time();
 			state = S_TIME;
 			step_mark = time;
 		} else if (sw_b_read()) {
