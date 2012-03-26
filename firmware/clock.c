@@ -12,7 +12,7 @@
 uint32_t time;
 
 static uint16_t ticks;
-static uint32_t step_mark;
+static uint8_t countdown;
 
 static volatile enum clock_state {
 	S_STANDBY,
@@ -124,6 +124,9 @@ ISR(TIMER1_COMPA_vect)
 
 	ticks = 0;
 
+	if (countdown)
+		countdown--;
+
 	if (state == S_TIME)
 		show_time();
 }
@@ -186,19 +189,19 @@ void clock_poll(void)
 		if (sw_a_read()) {
 			show_time();
 			state = S_TIME;
-			step_mark = time;
+			countdown = TIME_TIMEOUT;
 		} else if (sw_b_read()) {
 			show_voltage();
 			state = S_BATT;
-			step_mark = time;
+			countdown = BATT_TIMEOUT;
 		}
 		break;
 	case S_TIME:
-		if (time > step_mark + TIME_TIMEOUT)
+		if (countdown == 0)
 			state = S_STANDBY;
 		break;
 	case S_BATT:
-		if (time > step_mark + BATT_TIMEOUT)
+		if (countdown == 0)
 			state = S_STANDBY;
 		break;
 	}
