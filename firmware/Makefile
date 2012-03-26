@@ -7,6 +7,7 @@ SIZE	= avr-size
 GDB	= avr-gdb
 AVRDUDE	= avrdude
 
+PRE_BOOTLOADER = usbtool -P AVR-Clock control in vendor device 0xff 0 0; sleep 2
 BOOTLOADER = bootloadHID
 BOOTLOADER_FLAGS = -r main_text.hex
 
@@ -62,6 +63,7 @@ fuse:
 	$(AVRDUDE) $(AVRDUDEFLAGS) -U lfuse:w:$(LFUSE):m -U hfuse:w:$(HFUSE):m
 
 boot: $(targets)
+	$(PRE_BOOTLOADER)
 	$(BOOTLOADER) $(BOOTLOADER_FLAGS)
 
 .PHONY: clean
