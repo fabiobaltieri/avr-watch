@@ -10,6 +10,7 @@
 
 #define TIME_TIMEOUT 5
 #define BATT_TIMEOUT 2
+#define TICK_COUNT 100
 
 uint32_t time;
 
@@ -87,13 +88,11 @@ ISR(TIMER0_COMPA_vect)
 
 	/* blink dots in TIME state */
 	if (state == S_TIME) {
-		if (ticks < 100)
+		if (ticks++ < TICK_COUNT)
 			digits[4] = 0xff;
 		else
 			digits[4] = 0x00;
 	}
-
-	ticks++;
 }
 
 void clear_display(void)
@@ -203,6 +202,7 @@ void clock_poll(void)
 	case S_STANDBY:
 		clear_display();
 		if (sw_a_read()) {
+			ticks = TICK_COUNT;
 			show_time();
 			state = S_TIME;
 			countdown = TIME_TIMEOUT;
