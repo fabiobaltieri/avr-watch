@@ -103,12 +103,10 @@ void show_time(void)
 	minute = time / 60 % 60;
 	hour = time / 60 / 60 % 24;
 
-	digits[0] = numbers[minute / 10 % 10];
-	digits[1] = numbers[minute % 10];
-	/* digits[0] = numbers[hour / 10 % 10]; */
-	/* digits[1] = numbers[hour % 10]; */
-	digits[2] = numbers[second / 10 % 10];
-	digits[3] = numbers[second % 10];
+	digits[0] = numbers[hour / 10 % 10];
+	digits[1] = numbers[hour % 10];
+	digits[2] = numbers[minute / 10 % 10];
+	digits[3] = numbers[minute % 10];
 	digits[4] = 0xff;
 }
 
