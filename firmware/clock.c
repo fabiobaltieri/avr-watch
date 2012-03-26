@@ -10,7 +10,7 @@
 
 #define TIME_TIMEOUT 5
 #define BATT_TIMEOUT 2
-#define TICK_COUNT 100
+#define TICK_COUNT 150
 
 uint32_t time;
 
