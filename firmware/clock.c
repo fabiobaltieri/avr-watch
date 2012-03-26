@@ -4,6 +4,8 @@
 
 #include "board.h"
 
+#include "adc.h"
+
 #define TIME_1S_TOP 375
 #define TIME_TIMEOUT 5
 #define BATT_TIMEOUT 5
@@ -35,6 +37,7 @@ static uint8_t numbers[] = { 0x9f, 0x84, 0x2f, 0xad, /* 0 1 2 3 */
 			     0x1b, 0xa7, 0x3b, 0x3a, /* C d E F */
 			     0x40, 0xa3, 0x20, 0x33, /* . o - t */
 };
+#define LCD_DOT 0x40
 
 ISR(TIMER0_COMPA_vect)
 {
@@ -71,6 +74,23 @@ ISR(TIMER0_COMPA_vect)
 void clear_display(void)
 {
 	memset(digits, 0, sizeof(digits));
+}
+
+void show_voltage(void)
+{
+	uint32_t voltage;
+
+	adc_init();
+	voltage = adc_get(AIN_BATTERY);
+	adc_stop();
+
+	voltage = voltage * 1100 / 1024;
+	voltage = voltage * (10 + 33) / 10;
+
+	digits[0] = numbers[voltage / 10 / 10 / 10 % 10] | LCD_DOT;
+	digits[1] = numbers[voltage / 10 / 10 % 10];
+	digits[2] = numbers[voltage / 10 % 10];
+	digits[3] = numbers[voltage % 10];
 }
 
 void show_time(void)
@@ -161,6 +181,7 @@ void clock_poll(void)
 			state = S_TIME;
 			step_mark = time;
 		} else if (sw_b_read()) {
+			show_voltage();
 			state = S_BATT;
 			step_mark = time;
 		}

@@ -83,7 +83,7 @@
 	} while (0)
 
 #define sw_a_read() (!(SW_A_PIN & _BV(SW_A)))
-#define sw_b_read() (!(SW_A_PIN & _BV(SW_A)))
+#define sw_b_read() (!(SW_B_PIN & _BV(SW_B)))
 
 /* CHG */
 #define CHG_PCINT	PCINT20
@@ -98,3 +98,7 @@
 	} while (0)
 
 #define chg_read() (CHG_PIN & _BV(CHG))
+
+/* Analog */
+
+#define AIN_BATTERY	(_BV(REFS0) | _BV(REFS1) | 7) /* channel 7, 1V1 reference */
