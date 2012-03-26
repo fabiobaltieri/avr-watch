@@ -97,7 +97,7 @@
 		CHG_PCMSK |= _BV(CHG_PCINT);	\
 	} while (0)
 
-#define chg_read() (CHG_PIN & _BV(CHG))
+#define chg_read() (!(CHG_PIN & _BV(CHG)))
 
 /* Analog */
 

@@ -240,10 +240,24 @@ void clock_poll(void)
 		break;
 	}
 
-	if (state != S_STANDBY) {
+	if (state != S_STANDBY || chg_read()) {
 		refresh_running = 1;
 		PRR &= ~_BV(PRTIM0); /* start refresh timer */
 	} else {
 		refresh_running = 0;
+	}
+
+	/* battery charging indicator */
+	if (state == S_STANDBY && chg_read()) {
+		switch (time % 5) {
+		case 4:
+			digits[3] = LCD_DOT;
+		case 3:
+			digits[2] = LCD_DOT;
+		case 2:
+			digits[1] = LCD_DOT;
+		case 1:
+			digits[0] = LCD_DOT;
+		}
 	}
 }
