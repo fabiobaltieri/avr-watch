@@ -27,23 +27,28 @@ static void reset_cpu(void)
 usbMsgLen_t usbFunctionSetup(uint8_t data[8])
 {
 	struct usbRequest *rq = (void *)data;
-	static uchar dataBuffer[4];
+	static union {
+		uint32_t l;
+		uint8_t  b[4];
+	} temp;
 
-	if (rq->bRequest == CUSTOM_RQ_ECHO) {
-		dataBuffer[0] = rq->wValue.bytes[0];
-		dataBuffer[1] = rq->wValue.bytes[1];
-		dataBuffer[2] = rq->wIndex.bytes[0];
-		dataBuffer[3] = rq->wIndex.bytes[1];
-		usbMsgPtr = dataBuffer;
-		return 4;
-	} else if (rq->bRequest == CUSTOM_RQ_SET_STATUS) {
-	} else if (rq->bRequest == CUSTOM_RQ_GET_STATUS) {
-		dataBuffer[0] = 0xca;
-		usbMsgPtr = dataBuffer;
-		return 1;
-	} else if (rq->bRequest == CUSTOM_RQ_RESET) {
+	switch (rq->bRequest) {
+	case CUSTOM_RQ_GET_TIME:
+		temp.l = time;
+		usbMsgPtr = (uint8_t *)&temp;
+		return sizeof(temp);
+	case CUSTOM_RQ_SET_TIME:
+		temp.b[0] = rq->wValue.bytes[0];
+		temp.b[1] = rq->wValue.bytes[1];
+		temp.b[2] = rq->wIndex.bytes[0];
+		temp.b[3] = rq->wIndex.bytes[1];
+		time = temp.l;
+		return 0;
+	case CUSTOM_RQ_RESET:
 		reset_cpu();
+		break;
 	}
+
 	return 0;
 }
 

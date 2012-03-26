@@ -13,7 +13,7 @@
 uint32_t time;
 
 static uint16_t jiffies;
-static uint16_t step_mark;
+static uint32_t step_mark;
 
 static enum clock_state {
 	S_STANDBY,
@@ -103,12 +103,13 @@ void show_time(void)
 	minute = time / 60 % 60;
 	hour = time / 60 / 60 % 24;
 
-	digits[0] = numbers[second / 10 % 10];
-	digits[1] = numbers[second % 10];
+	digits[0] = numbers[minute / 10 % 10];
+	digits[1] = numbers[minute % 10];
 	/* digits[0] = numbers[hour / 10 % 10]; */
 	/* digits[1] = numbers[hour % 10]; */
-	digits[2] = numbers[minute / 10 % 10];
-	digits[3] = numbers[minute % 10];
+	digits[2] = numbers[second / 10 % 10];
+	digits[3] = numbers[second % 10];
+	digits[4] = 0xff;
 }
 
 ISR(TIMER2_COMPA_vect)
