@@ -84,15 +84,21 @@ ISR(TIMER0_COMPA_vect)
 
 	led_set(digits[digit_count]);
 
-	digit_count = (digit_count + 1) % 5;
-
-	/* blink dots in TIME state */
-	if (state == S_TIME) {
+	if (state == S_STANDBY) {
+		/* stop and clear on 4th digit if in standby */
+		if (digit_count == 4) {
+			led_set(0x00);
+			PRR |= _BV(PRTIM0);
+		}
+	} else if (state == S_TIME) {
+		/* blink dots in TIME state */
 		if (ticks++ < TICK_COUNT)
 			digits[4] = 0xff;
 		else
 			digits[4] = 0x00;
 	}
+
+	digit_count = (digit_count + 1) % 5;
 }
 
 static void clear_display(void)
@@ -229,4 +235,7 @@ void clock_poll(void)
 			state = S_STANDBY;
 		break;
 	}
+
+	if (state != S_STANDBY)
+		PRR &= ~_BV(PRTIM0); /* start refresh timer */
 }

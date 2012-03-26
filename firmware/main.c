@@ -82,7 +82,7 @@ int __attribute__((noreturn)) main(void)
 	PRR = ( (1 << PRTWI) |    /* TWI */
 		(0 << PRTIM0) |   /* Timer 0 */
 		(0 << PRTIM1) |   /* Timer 1 */
-		(0 << PRTIM2) |   /* Timer 2 */
+		(1 << PRTIM2) |   /* Timer 2 */
 		(1 << PRSPI) |    /* SPI */
 		(1 << PRUSART0) | /* USART0 */
 		(0 << PRADC) );   /* ADC */
