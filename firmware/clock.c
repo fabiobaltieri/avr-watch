@@ -46,14 +46,38 @@ static int refresh_running;
 
 static uint8_t usb_enabled;
 
+#define CS0_MASK (_BV(CS02) | _BV(CS01) | _BV(CS00))
+#define CS0_FAST ((0 << CS02) | (1 << CS01) | (1 << CS00))
+#define CS0_SLOW ((1 << CS02) | (0 << CS01) | (0 << CS00))
+
+#define CS1_MASK (_BV(CS12) | _BV(CS11) | _BV(CS10))
+#define CS1_FAST ((0 << CS12) | (1 << CS11) | (1 << CS10))
+#define CS1_SLOW ((1 << CS12) | (0 << CS11) | (0 << CS10))
+
 static void usb_toggle(void)
 {
 	if (usb_enabled) {
 		usbDeviceDisconnect();
 		usb_enabled = 0;
+
+		/* slow down */
+
+		CLKPR = _BV(CLKPCE);
+		CLKPR = 2;
+
+		TCCR1B = (TCCR1B & ~CS1_MASK) | CS1_FAST;
+		TCCR0B = (TCCR0B & ~CS0_MASK) | CS0_FAST;
 	} else {
 		usbDeviceConnect();
 		usb_enabled = 1;
+
+		/* speed up */
+
+		TCCR0B = (TCCR0B & ~CS0_MASK) | CS0_SLOW;
+		TCCR1B = (TCCR1B & ~CS1_MASK) | CS1_SLOW;
+
+		CLKPR = _BV(CLKPCE);
+		CLKPR = 0;
 	}
 }
 
@@ -176,7 +200,7 @@ static void timer_init(void)
 
 	TCCR0A = ( (1 << WGM01) | (0 << WGM00) ); /* CTC */
 	TCCR0B = ( (0 << WGM02) |
-		   (1 << CS02) | (0 << CS01) | (0 << CS00) );
+		   CS0_SLOW );
 
 	/* Timer 1 - real time couter */
 
@@ -186,7 +210,9 @@ static void timer_init(void)
 
 	TCCR1A = ( (0 << WGM11) | (0 << WGM10) );
 	TCCR1B = ( (0 << WGM13) | (1 << WGM12) |
-		   (1 << CS22) | (0 << CS21) | (0 << CS20) );
+		   CS1_SLOW );
+
+	/* NOTE: TCCR*B are also modified in usb_toggle */
 }
 
 void clock_init(void)
