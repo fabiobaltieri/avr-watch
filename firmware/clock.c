@@ -107,7 +107,10 @@ void show_time(void)
 	digits[1] = numbers[hour % 10];
 	digits[2] = numbers[minute / 10 % 10];
 	digits[3] = numbers[minute % 10];
-	digits[4] = 0xff;
+	if (jiffies < TIME_1S_TOP / 8)
+		digits[4] = 0xff;
+	else
+		digits[4] = 0x00;
 }
 
 ISR(TIMER2_COMPA_vect)
