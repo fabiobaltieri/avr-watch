@@ -2,6 +2,8 @@
 #include <avr/interrupt.h>
 #include <string.h>
 
+#include "usbdrv.h"
+
 #include "board.h"
 
 #include "adc.h"
@@ -17,6 +19,7 @@ static uint8_t countdown;
 static volatile enum clock_state {
 	S_STANDBY,
 	S_TIME,
+	S_BATT_DEBOUNCE,
 	S_BATT,
 } state;
 
@@ -37,6 +40,19 @@ static uint8_t numbers[] = { 0x9f, 0x84, 0x2f, 0xad, /* 0 1 2 3 */
 			     0x40, 0xa3, 0x20, 0x33, /* . o - t */
 };
 #define LCD_DOT 0x40
+
+static uint8_t usb_enabled;
+
+static void usb_toggle(void)
+{
+	if (usb_enabled) {
+		usbDeviceDisconnect();
+		usb_enabled = 0;
+	} else {
+		usbDeviceConnect();
+		usb_enabled = 1;
+	}
+}
 
 ISR(TIMER0_COMPA_vect)
 {
@@ -192,7 +208,7 @@ void clock_poll(void)
 			countdown = TIME_TIMEOUT;
 		} else if (sw_b_read()) {
 			show_voltage();
-			state = S_BATT;
+			state = S_BATT_DEBOUNCE;
 			countdown = BATT_TIMEOUT;
 		}
 		break;
@@ -200,7 +216,15 @@ void clock_poll(void)
 		if (countdown == 0)
 			state = S_STANDBY;
 		break;
+	case S_BATT_DEBOUNCE:
+		if (!sw_b_read())
+			state = S_BATT;
+		break;
 	case S_BATT:
+		if (sw_b_read()) {
+			usb_toggle();
+			state = S_BATT_DEBOUNCE;
+		}
 		if (countdown == 0)
 			state = S_STANDBY;
 		break;
