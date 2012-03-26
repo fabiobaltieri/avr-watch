@@ -199,6 +199,7 @@ void clock_init(void)
 	ticks = 0;
 	digit_count = 0;
 	refresh_running = 0;
+	usb_enabled = 1;
 
 	state = S_STANDBY;
 
