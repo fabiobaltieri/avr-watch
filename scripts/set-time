@@ -1,0 +1,11 @@
+#!/bin/sh
+
+time=$( date +%s )
+time=$(( $time + 60 * 60 * 2 ))
+time=$( printf %08x $time )
+
+high=${time:4:4}
+low=${time:0:4}
+
+usbtool -P "AVR-Clock" control in vendor device 0x01 0x$high 0x$low
+usbtool -P "AVR-Clock" control in vendor device 0x00 0x0 0x0
