@@ -57,7 +57,7 @@ static uint8_t usb_enabled;
 static void usb_toggle(void)
 {
 	if (usb_enabled) {
-		usbDeviceDisconnect();
+		EIMSK &= ~_BV(INT0);
 		usb_enabled = 0;
 
 		/* slow down */
@@ -68,7 +68,7 @@ static void usb_toggle(void)
 		TCCR1B = (TCCR1B & ~CS1_MASK) | CS1_FAST;
 		TCCR0B = (TCCR0B & ~CS0_MASK) | CS0_FAST;
 	} else {
-		usbDeviceConnect();
+		EIMSK |= _BV(INT0);
 		usb_enabled = 1;
 
 		/* speed up */
@@ -147,6 +147,8 @@ static void show_voltage(void)
 	digits[1] = numbers[voltage / 10 / 10 % 10];
 	digits[2] = numbers[voltage / 10 % 10];
 	digits[3] = numbers[voltage % 10];
+	if (usb_enabled)
+		digits[3] |= LCD_DOT;
 }
 
 static void show_time(void)
@@ -260,7 +262,9 @@ void clock_poll(void)
 	case S_BATT:
 		if (sw_b_read()) {
 			usb_toggle();
+			show_voltage();
 			state = S_BATT_DEBOUNCE;
+			countdown = BATT_TIMEOUT;
 		}
 		if (countdown == 0)
 			state = S_STANDBY;
