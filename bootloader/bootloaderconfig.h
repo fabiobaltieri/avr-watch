@@ -1,11 +1,9 @@
-/* Name: bootloaderconfig.h
- * Project: AVR bootloader HID
- * Author: Christian Starkjohann
- * Creation Date: 2007-03-19
- * Tabsize: 4
+/*
+ * Author: Fabio Baltieri
+ * Original Author: Christian Starkjohann
  * Copyright: (c) 2007 by OBJECTIVE DEVELOPMENT Software GmbH
  * License: GNU GPL v2 (see License.txt)
- * This Revision: $Id: bootloaderconfig.h 699 2008-11-26 19:50:32Z cs $
+ *
  */
 
 #ifndef __bootloaderconfig_h_included__

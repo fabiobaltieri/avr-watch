@@ -1,11 +1,9 @@
-/* Name: usbconfig.h
- * Project: AVR USB driver
- * Author: Christian Starkjohann
- * Creation Date: 2007-03-13
- * Tabsize: 4
+/*
+ * Author: Fabio Baltieri
+ * Original Author: Christian Starkjohann
  * Copyright: (c) 2007 by OBJECTIVE DEVELOPMENT Software GmbH
  * License: GNU GPL v2 (see License.txt)
- * This Revision: $Id: usbconfig.h 693 2008-11-14 15:09:37Z cs $
+ *
  */
 
 #ifndef __usbconfig_h_included__

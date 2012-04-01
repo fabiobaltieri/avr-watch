@@ -1,11 +1,9 @@
-/* Name: main.c
- * Project: AVR bootloader HID
- * Author: Christian Starkjohann
- * Creation Date: 2007-03-19
- * Tabsize: 4
+/*
+ * Author: Fabio Baltieri
+ * Original Author: Christian Starkjohann
  * Copyright: (c) 2007 by OBJECTIVE DEVELOPMENT Software GmbH
  * License: GNU GPL v2 (see License.txt)
- * This Revision: $Id: main.c 788 2010-05-30 20:54:41Z cs $
+ *
  */
 
 #include <avr/io.h>
