@@ -1,3 +1,6 @@
+# Copyright 2012 Fabio Baltieri (fabio.baltieri@gmail.com)
+# License: GNU GPL v2
+
 # Apps
 CC	= avr-gcc
 AS	= avr-as
