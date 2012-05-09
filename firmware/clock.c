@@ -150,8 +150,7 @@ static void show_voltage(void)
 	voltage = adc_get(AIN_BATTERY);
 	adc_stop();
 
-	voltage = voltage * 1100 / 1024;
-	voltage = voltage * (10 + 33) / 10;
+	voltage = voltage * 1100 * 43 / (1024 * 10);
 
 	digits[0] = numbers[voltage / 10 / 10 / 10 % 10] | LCD_DOT;
 	digits[1] = numbers[voltage / 10 / 10 % 10];
