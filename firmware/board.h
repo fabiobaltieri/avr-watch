@@ -101,4 +101,4 @@
 
 /* Analog */
 
-#define AIN_BATTERY	(_BV(REFS0) | _BV(REFS1) | 7) /* channel 7, 1V1 reference */
+#define AIN_BATTERY	(_BV(REFS0) | 0x0e) /* measure Vbg, AVcc reference */

@@ -142,6 +142,7 @@ static void clear_display(void)
 	memset(digits, 0, sizeof(digits));
 }
 
+#define div_round(a, b) (((a) + ((b)/2)) / (b))
 static void show_voltage(void)
 {
 	uint32_t voltage;
@@ -150,7 +151,7 @@ static void show_voltage(void)
 	voltage = adc_get(AIN_BATTERY);
 	adc_stop();
 
-	voltage = voltage * 1100 * 43 / (1024 * 10);
+	voltage = div_round(1100l * 1024, voltage);
 
 	digits[0] = numbers[voltage / 10 / 10 / 10 % 10] | LCD_DOT;
 	digits[1] = numbers[voltage / 10 / 10 % 10];
